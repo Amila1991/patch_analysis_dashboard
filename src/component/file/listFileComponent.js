@@ -3,6 +3,7 @@ import axios from "axios/index";
 import TableComponent from "../common/tableComponent";
 import config from "../../config";
 import constant from "../constant/constants";
+import ModalJavaClassComponent from "./modalJavaClassComponent";
 
 
 /**
@@ -35,49 +36,15 @@ export default class ListFileComponent extends Component {
         });
     }
 
-    handleClick = (e, {name}) => {
-        this.setState({activeItem: name});
-        axios.get('http://localhost:9090/hello')
-            .then(response => {
-                console.log(response);
-                console.log(response.data);
-
-                this.setState({repositories: response.data});
-
-            });
-    };
-
     onSetRedirect = javaClass => () => {
-        //console.log('event repo', e);
         console.log('dsdsssddsdsdddsds', javaClass);
         this.setState({
             redirect: true,
             selectJavaClass: javaClass
         }, () => {
-            this.classModal.show(this.state.selectJavaClass);
+            this.classModal.showModal(this.state.selectJavaClass);
         })
     };
-
-    // renderRedirect = () => {
-    //     if (this.state.redirect) {
-    //         //let url =  `/file/${this.state.selectJavaClass}`;
-    //         return <Redirect to={`/file/mostModifiedJavaClasses/${this.state.selectJavaClass.FILE_INFO_ID}`}/>
-    //     }
-    // };
-
-
-    // retrieveMostModifiedJavaClasses = (sortColumn, sortDir, pageIndex, pageSize) => {
-    //     console.log('ABC ', sortColumn, sortDir, pageSize, pageIndex);
-    //     axios.get(`http://${config.backendServer.host}:${config.backendServer.port}/file/mostModifiedJavaClasses?pageIndex=` + pageIndex + '&pageSize=' + pageSize + '&sortColumn=' + sortColumn + '&sortDir=' + sortDir)
-    //         .then(response => {
-    //             console.log(response);
-    //             console.log(response.data);
-    //
-    //             this.setState({javaClasses: response.data});
-    //             this.classTable.setStateProp(this.state.javaClasses);
-    //         });
-    // };
-
 
     retrieveFiles = (sortColumn, sortDir, pageIndex, pageSize) => {
         console.log('ABC ', sortColumn, sortDir, pageSize, pageIndex);
@@ -87,7 +54,7 @@ export default class ListFileComponent extends Component {
                 console.log(response);
                 console.log(response.data);
 
-                response.data.map((row, rowIndex) => {
+                response.data.map((row) => {
                     if (row.TEST_COVERAGE === '-1') {
                         row.TEST_COVERAGE = 'N/A';
                     }
@@ -99,8 +66,6 @@ export default class ListFileComponent extends Component {
 
                 this.setState({repositories: response.data});
                 this.fileTable.setStateProp(this.state.repositories);
-
-
             });
     };
 
@@ -110,6 +75,9 @@ export default class ListFileComponent extends Component {
             <div style={{
                 marginTop: this.state.product === "all" ? '20px' : '10px'
             }}>
+                <ModalJavaClassComponent
+                    ref={instance => this.classModal = instance}
+                />
                 <h2 style={{
                     marginLeft: '50px'
                 }}>Files</h2>
