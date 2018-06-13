@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {Icon, Select, Menu, Table, Grid} from 'semantic-ui-react';
+import {Icon, Select, Menu, Table} from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css';
 import PropTypes from "prop-types";
 
@@ -38,8 +38,6 @@ export default class TableComponent extends Component {
             this.onUpdateTable(this.state.sortColumn, this.state.sortDir, this.state.pageIndex, this.state.pageSize)
         });
 
-        console.log('props', this.state.sortColumn, this.state.sortDir, this.state.pageIndex, this.state.pageSize, this.state.headers, this.props.sortColumn);
-        //this.onUpdateTable(this.state.sortColumn, this.state.sortDir, this.state.pageIndex, this.state.pageSize);
     }
 
 
@@ -49,7 +47,6 @@ export default class TableComponent extends Component {
 
     onPaginationNoClick = (e, {name}) => {
         let index = parseInt(name);
-        console.log('new index', name);
         this.setState({pageIndex: index}, () => {
             this.onUpdateTable(this.state.sortColumn, this.state.sortDir, this.state.pageIndex, this.state.pageSize);
         });
@@ -57,18 +54,19 @@ export default class TableComponent extends Component {
 
     onPaginationNextClick = (e) => {
         let pageIndex = this.state.pageIndex + 1;
-        this.setState({pageIndex: pageIndex});
-        this.onUpdateTable(this.state.sortColumn, this.state.sortDir, pageIndex, this.state.pageSize);
+        this.setState({pageIndex: pageIndex}, () => {
+            this.onUpdateTable(this.state.sortColumn, this.state.sortDir, pageIndex, this.state.pageSize);
+        });
     };
 
     onPaginationPreviousClick = (e) => {
         let pageIndex = this.state.pageIndex - 1;
-        this.setState({pageIndex: pageIndex});
-        this.onUpdateTable(this.state.sortColumn, this.state.sortDir, pageIndex, this.state.pageSize);
+        this.setState({pageIndex: pageIndex}, () => {
+            this.onUpdateTable(this.state.sortColumn, this.state.sortDir, pageIndex, this.state.pageSize);
+        });
     };
 
     onChangePageSize = (e, {value}) => {
-        console.log('change page Size', e, value);
         this.setState({
             pageSize: value
         }, () => {
@@ -78,8 +76,6 @@ export default class TableComponent extends Component {
     };
 
     onSortClick = column => () => {
-        console.log('change sort column', column, this.state.sortColumn);
-
         this.setState({
             sortColumn: this.state.sortColumn !== column ? column : this.state.sortColumn,
             sortDir: this.state.sortColumn !== column ? 0 : (this.state.sortDir + 1) % 2,
@@ -87,27 +83,14 @@ export default class TableComponent extends Component {
         }, () => {
             this.onUpdateTable(this.state.sortColumn, this.state.sortDir, this.state.pageIndex, this.state.pageSize)
         });
-        // if (this.state.sortColumn !== column) {
-        //     this.setState({
-        //         sortColumn: column,
-        //         sortDir: 0
-        //     }, () => {this.onUpdateTable(this.state.sortColumn, this.state.sortDir, this.state.pageIndex, this.state.pageSize)});
-        // } else {
-        //     this.setState({
-        //         sortDir: (this.state.sortDir + 1) % 2
-        //     }, () => {this.onUpdateTable(this.state.sortColumn, this.state.sortDir, this.state.pageIndex, this.state.pageSize)});
-        // }
-
-        // this.onUpdateTable(this.state.sortColumn, this.state.sortDir, this.state.pageIndex, this.state.pageSize);
     };
 
     setStateProp = (data) => {
-        console.log('data', data);
         if (data.length > 0) {
             this.setState({
                 data: data
             });
-        } else if (this.state.pageIndex > 0) {
+        } else if (this.state.pageIndex > 1) {
             this.setState(
                 {
                     pageIndex: this.state.pageIndex - 1
@@ -118,9 +101,7 @@ export default class TableComponent extends Component {
     };
 
     generatePagination = () => {
-        console.log("A", this.state.pageIndex);
         if (this.state.pageIndex >= 4) {
-            console.log("B");
             return (
                 <Menu floated='right' pagination>
                     <Menu.Item as='a' onClick={this.onPaginationPreviousClick} icon>
@@ -141,7 +122,6 @@ export default class TableComponent extends Component {
                     </Menu.Item>}
                 </Menu>);
         } else {
-            console.log("C");
             return (
                 <Menu floated='right' pagination>
                     {this.state.pageIndex > 1 && <Menu.Item as='a' onClick={this.onPaginationPreviousClick} icon>
@@ -174,7 +154,6 @@ export default class TableComponent extends Component {
             value: 50,
             text: '50'
         }, {key: 100, value: 100, text: '100'}];
-        console.log('sortable', sortable);
         return (
             <div style={{
                 marginLeft: '50px',
@@ -184,7 +163,6 @@ export default class TableComponent extends Component {
                     <Table.Header>
                         <Table.Row>
                             {headers.map((value, index) => {
-                                console.log('index', index);
                                 return (<Table.HeaderCell key={index}
                                                           sorted={sortColumn === columns[index] ? sortDir === 1 ? 'descending' : 'ascending' : null}
                                                           onClick={this.onSortClick(this.state.columns[index])}>{value}</Table.HeaderCell>)
@@ -196,12 +174,7 @@ export default class TableComponent extends Component {
                         {data.map((row, rowIndex) => {
                             return (
                                 <Table.Row key={rowIndex}>
-                                    {/* {Object.keys(row).map((key, columnIndex) => {
-                                        console.log(key, row);
-                                        return (<Table.Cell key={columnIndex} onClick={this.props.onCellClick ? this.props.onCellClick(row[Object.keys(row)[0]]) : () => void(0)}>{row[key]}</Table.Cell>)
-                                    })}*/}
                                     {columns.map((key, columnIndex) => {
-                                        console.log(key);
                                         return (<Table.Cell key={columnIndex}
                                                             onClick={this.props.onCellClick ? this.props.onCellClick(row) : () => void(0)}>{row[key]}</Table.Cell>)
                                     })}
@@ -212,23 +185,12 @@ export default class TableComponent extends Component {
 
                     <Table.Footer fullWidth>
                         <Table.Row>
-                            {/*<Table.HeaderCell colSpan={columns.length-1}>*/}
-                            {/*<Grid>*/}
-                            {/*<Grid.Column floated='left' width={columns.length-1}>*/}
-                            {/*<div>*/}
-                            {/*<h5>{'Item per Page '}*/}
-                            {/*<Select placeholder='Item per Page' defaultValue={pageSize} onChange={this.onChangePageSize} options={options} upward compact />*/}
-                            {/*</h5>*/}
-                            {/*</div>*/}
-                            {/*</Grid.Column>*/}
-                            {/*</Grid>*/}
-                            {/*</Table.HeaderCell>*/}
                             <Table.HeaderCell colSpan={columns.length}>
                                 <h5>{'Item per Page '}
-                                <Select placeholder='Item per Page' defaultValue={pageSize}
-                                        onChange={this.onChangePageSize} options={options} upward compact/>
+                                    <Select placeholder='Item per Page' defaultValue={pageSize}
+                                            onChange={this.onChangePageSize} options={options} upward compact/>
 
-                                {this.generatePagination()}
+                                    {this.generatePagination()}
                                 </h5>
                             </Table.HeaderCell>
                         </Table.Row>
