@@ -64,27 +64,30 @@ export default class ModalModifiedJavaClassComponent extends Component {
     // };
 
     retrieveModifiedJavaClassIssues = () => {
+        console.log('ABCD', this.state.modifiedJavaClass);
         // console.log('ABC ', sortColumn, sortDir, pageSize, pageIndex, this.state.modifiedJavaClass);
-        this.setState({loading: true}, () => {
-            axios.get(`http://${config.backendServer.host}:${config.backendServer.port}/file/mostModifiedJavaClasses/${this.state.modifiedJavaClass.FILE_INFO_ID}/issues`)
-                .then(response => {
-                    console.log(response);
-                    console.log(response.data);
+        if (this.state.modifiedJavaClass.NO_OF_ISSUES > 0) {
+            this.setState({loading: true}, () => {
+                axios.get(`http://${config.backendServer.host}:${config.backendServer.port}/file/${this.state.modifiedJavaClass.ID}/issues`)
+                    .then(response => {
+                        console.log(response);
+                        console.log(response.data);
 
-                    console.log('instance 1', this.issuesTable);
+                        console.log('instance 1', this.issuesTable);
 
-                    this.setState({
-                        issues: response.data,
-                        loading: false
-                    }, () => {
-                        if (this.issuesTable) {
-                            console.log("test");
-                            this.issuesTable.setStateProp(this.state.issues.slice(0, 25));
-                           // this.setState({loading: false});
-                        }
+                        this.setState({
+                            issues: response.data,
+                            loading: false
+                        }, () => {
+                            if (this.issuesTable) {
+                                console.log("test");
+                                this.issuesTable.setStateProp(this.state.issues.slice(0, 25));
+                                // this.setState({loading: false});
+                            }
+                        });
                     });
-                });
-        });
+            });
+        }
     };
 
     loadModifiedJavaClassIssues = (sortColumn, sortDir, pageIndex, pageSize) => {
@@ -96,7 +99,7 @@ export default class ModalModifiedJavaClassComponent extends Component {
         }
     };
 
-    show = (modifiedJavaClass) => this.setState({
+    showModal = (modifiedJavaClass) => this.setState({
         openModal: true,
         modifiedJavaClass: modifiedJavaClass
     }, () => {
