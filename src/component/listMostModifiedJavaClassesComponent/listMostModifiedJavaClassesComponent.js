@@ -2,8 +2,8 @@ import React, {Component} from "react";
 import axios from "axios/index";
 import {Redirect} from 'react-router-dom';
 import TableComponent from "../common/tableComponent";
-import ModalModifiedJavaClassComponent from "./modalModifiedJavaClassComponent";
 import config from "../../config";
+import ListFileComponent from "../file/listFileComponent";
 
 
 /**
@@ -11,83 +11,80 @@ import config from "../../config";
  */
 
 
-export default class ListMostModifiedJavaClassesComponent extends Component {
+export default class ListMostModifiedJavaClassesComponent extends ListFileComponent {
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            headers: ["Product name", "File Name", "No of Patches", "No of Issues", "Test Coverage"],
-            columns: ["PRODUCT_NAME", "FILE_NAME", "NO_OF_PATCHES", "NO_OF_ISSUES", "TEST_COVERAGE"],
-            javaClasses: [],
-            redirect: false,
-            selectJavaClass:''
-        };
-    }
+     constructor(props) {
+         super(props);
+     };
 
-
-    handleClick = (e, { name }) => {
-        this.setState({ activeItem: name });
-        axios.get('http://localhost:9090/hello')
-            .then(response => {
-                console.log(response);
-                console.log(response.data);
-
-                this.setState({ repositories: response.data });
-
-            });
+    renderRedirect = () => {
+        if (this.state.redirect) {
+            //let url =  `/file/${this.state.selectJavaClass}`;
+            return <Redirect to={`/file/mostModifiedJavaClasses/${this.state.selectJavaClass.ID}`}/>
+        }
     };
 
-    onSetRedirect = javaClass => () => {
-        //console.log('event repo', e);
-        console.log('dsdsssddsdsdddsds', javaClass);
-        this.setState({
-            redirect: true,
-            selectJavaClass: javaClass
-        }, () => {
-            this.classModal.show(this.state.selectJavaClass);
-        })
+    setComponentHeading = () => {
+        return 'Most Updated Java Classes';
     };
 
-    // renderRedirect = () => {
-    //     if (this.state.redirect) {
-    //         //let url =  `/file/${this.state.selectJavaClass}`;
-    //         return <Redirect to={`/file/mostModifiedJavaClasses/${this.state.selectJavaClass.FILE_INFO_ID}`}/>
-    //     }
+
+    // retrieveMostModifiedJavaClasses = (sortColumn, sortDir, pageIndex, pageSize) => {
+    //     console.log('ABC ', sortColumn, sortDir, pageSize, pageIndex);
+    //     axios.get(`http://${config.backendServer.host}:${config.backendServer.port}/file/mostModifiedJavaClasses?pageIndex=` + pageIndex + '&pageSize=' + pageSize + '&sortColumn=' + sortColumn + '&sortDir=' + sortDir)
+    //         .then(response => {
+    //             console.log(response);
+    //             console.log(response.data);
+    //
+    //             this.setState({ javaClasses: response.data});
+    //             this.classTable.setStateProp(this.state.javaClasses);
+    //         });
     // };
 
 
-    retrieveMostModifiedJavaClasses = (sortColumn, sortDir, pageIndex, pageSize) => {
-        console.log('ABC ', sortColumn, sortDir, pageSize, pageIndex);
+    retrieveFiles = (sortColumn, sortDir, pageIndex, pageSize) => {
+        console.log('ABC java class ', sortColumn, sortDir, pageSize, pageIndex);
+        let pathParam = this.state.parentComponentType ? this.state.parentComponentType + '/' + this.state.value : '';
         axios.get(`http://${config.backendServer.host}:${config.backendServer.port}/file/mostModifiedJavaClasses?pageIndex=` + pageIndex + '&pageSize=' + pageSize + '&sortColumn=' + sortColumn + '&sortDir=' + sortDir)
             .then(response => {
                 console.log(response);
                 console.log(response.data);
 
-                this.setState({ javaClasses: response.data});
-                this.classTable.setStateProp(this.state.javaClasses);
+                response.data.map((row) => {
+                    if (row.TEST_COVERAGE === '-1') {
+                        row.TEST_COVERAGE = 'N/A';
+                    }
+
+                    if(row.NO_OF_ISSUES === -1) {
+                        row.NO_OF_ISSUES = 'N/A';
+                    }
+                });
+
+                this.setState({files: response.data});
+                this.fileTable.setStateProp(this.state.files);
             });
     };
 
-
-    render() {
-        return (
-            <div>
-                {/*{this.renderRedirect()}*/}
-                <ModalModifiedJavaClassComponent
-                    ref={instance => this.classModal = instance}
-                />
-                <TableComponent
-                    headers={this.state.headers}
-                    sortable={true}
-                    selectable={true}
-                    columns={this.state.columns}
-                    sortColumn={this.state.columns[2]}
-                    sortDir={1}
-                    onUpdateRecords={this.retrieveMostModifiedJavaClasses}
-                    onCellClick={this.onSetRedirect}
-                    ref={instance => this.classTable = instance}
-                />
-            </div>
-        );
-    }
+    //
+    // render() {
+    //     return (
+    //         <div>
+    //             {this.renderRedirect()}
+    //             {/*<ModalModifiedJavaClassComponent*/}
+    //                 {/*ref={instance => this.classModal = instance}*/}
+    //             {/*/>*/}
+    //             <TableComponent
+    //                 headers={this.state.headers}
+    //                 sortable={true}
+    //                 selectable={true}
+    //                 columns={this.state.columns}
+    //                 sortColumn={this.state.columns[2]}
+    //                 sortDir={1}
+    //                 onUpdateRecords={this.retrieveMostModifiedJavaClasses}
+    //                 onCellClick={this.onSetRedirect}
+    //                 ref={instance => this.classTable = instance}
+    //             />
+    //         </div>
+    //     );
+    // }
 }

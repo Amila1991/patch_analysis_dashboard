@@ -10,6 +10,7 @@ import ListMostModifiedJavaClassesComponent
     from "../listMostModifiedJavaClassesComponent/listMostModifiedJavaClassesComponent";
 import ViewModifiedJavaClassComponent from "../listMostModifiedJavaClassesComponent/viewModifiedJavaClassComponent";
 import ListPatchComponent from "../patchComponent/listPatchComponent";
+import ViewJavaClassComponent from "../file/viewJavaClassComponent";
 
 class BaseComponent extends Component{
 
@@ -32,6 +33,7 @@ class BaseComponent extends Component{
                     <Route path="/file/mostModifiedJavaClasses" component={ListMostModifiedJavaClassesComponent} exact={true}/>
                     <Route path="/file/mostModifiedJavaClasses/:fileId" component={ViewModifiedJavaClassComponent}/>
                     <Route path="/patch" component={ListPatchComponent}/>
+                    <Route path="/file/javaClass/:fileId" component={ViewJavaClassComponent} exact={true}/>
 
                 </div>
             </BrowserRouter>

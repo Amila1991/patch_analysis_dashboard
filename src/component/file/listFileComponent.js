@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import {Redirect} from 'react-router-dom';
 import axios from "axios/index";
 import TableComponent from "../common/tableComponent";
 import config from "../../config";
@@ -16,14 +17,13 @@ export default class ListFileComponent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            headers: ["Product name", "File Name", "No of Patches", "No of Issues", "Test Coverage"],
-            columns: ["PRODUCT_NAME", "FILE_NAME", "NO_OF_PATCHES", "NO_OF_ISSUES", "TEST_COVERAGE"],
-            javaClasses: [],
+            headers: ["Product name", "File Name", "No of Patches", "No of Change Lines", "No of Issues", "Test Coverage"],
+            columns: ["PRODUCT_NAME", "FILE_NAME", "NO_OF_PATCHES", "CHURNS", "NO_OF_ISSUES", "TEST_COVERAGE"],
+            files: [],
             redirect: false,
             selectJavaClass: ''
         };
     }
-
 
     componentWillMount() {
         console.log("Repo display props", this.props, this.props.parentComponentType);
@@ -31,8 +31,8 @@ export default class ListFileComponent extends Component {
         this.setState({
             parentComponentType: parentComponentType,
             value: this.props.value ? this.props.value : '',
-            headers: parentComponentType === constant.COMPONENT_TYPE.PRODUCT ? ["File Name", "No of Patches", "No of Issues", "Test Coverage"] : this.state.headers,
-            columns: parentComponentType === constant.COMPONENT_TYPE.PRODUCT ? ["FILE_NAME", "NO_OF_PATCHES", "NO_OF_ISSUES", "TEST_COVERAGE"] : this.state.columns
+            headers: parentComponentType === constant.COMPONENT_TYPE.PRODUCT ? ["File Name", "No of Patches", "No of Change Lines",  "No of Issues", "Test Coverage"] : this.state.headers,
+            columns: parentComponentType === constant.COMPONENT_TYPE.PRODUCT ? ["FILE_NAME", "NO_OF_PATCHES", "CHURNS", "NO_OF_ISSUES", "TEST_COVERAGE"] : this.state.columns
         });
     }
 
@@ -41,13 +41,19 @@ export default class ListFileComponent extends Component {
         this.setState({
             redirect: true,
             selectJavaClass: javaClass
-        }, () => {
-            this.classModal.showModal(this.state.selectJavaClass);
         })
     };
 
+    renderRedirect = () => {
+        if (this.state.redirect) {
+            console.log("repo 123 : ", this.state.selectJavaClass);
+            let url = `/file/${this.state.selectJavaClass.ID}`;
+            return <Redirect to={`/file/javaClass/${this.state.selectJavaClass.ID}`}/>
+        }
+    };
+
     retrieveFiles = (sortColumn, sortDir, pageIndex, pageSize) => {
-        console.log('ABC ', sortColumn, sortDir, pageSize, pageIndex);
+        console.log('ABC file ', sortColumn, sortDir, pageSize, pageIndex);
         let pathParam = this.state.parentComponentType ? this.state.parentComponentType + '/' + this.state.value : '';
         axios.get(`http://${config.backendServer.host}:${config.backendServer.port}/file/${pathParam}?pageIndex=` + pageIndex + '&pageSize=' + pageSize + '&sortColumn=' + sortColumn + '&sortDir=' + sortDir)
             .then(response => {
@@ -64,23 +70,25 @@ export default class ListFileComponent extends Component {
                     }
                 });
 
-                this.setState({repositories: response.data});
-                this.fileTable.setStateProp(this.state.repositories);
+                this.setState({files: response.data});
+                this.fileTable.setStateProp(this.state.files);
             });
     };
 
+    setComponentHeading = () => {
+        return 'Files';
+    };
 
     render() {
+        console.log('product  ' , this.state.parentComponentType, this.state.parentComponentType === null);
         return (
             <div style={{
-                marginTop: this.state.product === "all" ? '20px' : '10px'
+                marginTop: this.state.parentComponentType === null ? '20px' : '10px'
             }}>
-                <ModalJavaClassComponent
-                    ref={instance => this.classModal = instance}
-                />
+                {this.renderRedirect()}
                 <h2 style={{
                     marginLeft: '50px'
-                }}>Files</h2>
+                }}>{this.setComponentHeading()}</h2>
                 <div>
                     <TableComponent
                         headers={this.state.headers}
