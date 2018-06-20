@@ -5,6 +5,7 @@ import 'semantic-ui-css/semantic.min.css';
 import axios from "axios/index";
 import TableComponent from "../common/tableComponent";
 import config from "../../config";
+import ModalShowErrorsJavaClass from "../file/fileSource/modalShowErrorsJavaClass";
 
 
 /**
@@ -68,7 +69,7 @@ export default class ModalModifiedJavaClassComponent extends Component {
         // console.log('ABC ', sortColumn, sortDir, pageSize, pageIndex, this.state.modifiedJavaClass);
         if (this.state.modifiedJavaClass.NO_OF_ISSUES > 0) {
             this.setState({loading: true}, () => {
-                axios.get(`http://${config.backendServer.host}:${config.backendServer.port}/file/${this.state.modifiedJavaClass.ID}/issues`)
+                axios.get(`http://${config.backendServer.host}:${config.backendServer.port}/file/${this.state.modifiedJavaClass.FILE_INFO_ID}/issues`)
                     .then(response => {
                         console.log(response);
                         console.log(response.data);
@@ -107,6 +108,15 @@ export default class ModalModifiedJavaClassComponent extends Component {
     });
     close = () => this.setState({openModal: false});
 
+    OnClickRow = issue => () => {
+        var lineNumberval = issue['LINE'];
+        this.setState({
+            codeLineID:lineNumberval,
+        }, () => {
+            this.classModal.show();
+            console.log('LINE NUMBER' , this.state.codeLineID);
+        });
+    };
 
     render() {
         console.log('issues 1 ', this.state.issues.length, this.state.loading);
@@ -142,16 +152,21 @@ export default class ModalModifiedJavaClassComponent extends Component {
                                 {this.state.modifiedJavaClass.NO_OF_ISSUES > 0 && <TableComponent
                                     headers={this.state.headers}
                                     sortable={false}
-                                    selectable={false}
+                                    selectable={true}
                                     columns={this.state.columns}
                                     sortColumn={this.state.columns[0]}
                                     data={this.state.issues}
                                     onUpdateRecords={this.loadModifiedJavaClassIssues}
+                                    onCellClick={this.OnClickRow}
                                     ref={instance => this.issuesTable = instance}
                                 />}
                             </div>
 
                         </Modal.Description>
+                        <ModalShowErrorsJavaClass
+                            ref={instance => this.classModal = instance}
+                            codeLine = {this.state.codeLineID}
+                        />
                     </Modal.Content>
                     <Modal.Actions>
                         {/*<Button primary>*/}
