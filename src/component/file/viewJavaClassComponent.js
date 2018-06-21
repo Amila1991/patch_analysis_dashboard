@@ -4,6 +4,7 @@ import 'semantic-ui-css/semantic.min.css';
 import axios from "axios/index";
 import TableComponent from "../common/tableComponent";
 import config from "../../config";
+import ModalShowErrorsJavaClass from "../file/fileSource/modalShowErrorsJavaClass";
 
 
 /**
@@ -32,7 +33,8 @@ export default class ViewJavaClassComponent extends Component {
             headers: ["Error Lines", "Error Code", "Description"],
             columns: ["LINE", "ERROR_CODE", "DESCRIPTION"],
             issues: [],
-            loading: false
+            loading: false,
+            codeLineID: 0,
         };
     }
 
@@ -84,7 +86,7 @@ export default class ViewJavaClassComponent extends Component {
     // };
 
     retrieveJavaClass = (fileId) => {
-        console.log("+++++++++++++++++++++++ parent Method ++++++++++++++++++++++++++++++");
+        console.log("+++++++++++++++++++++++ parent Method ++++++++++++++++++++++++++++++", fileId);
         this.setState({loading: true}, () => {
             axios.get(`http://${config.backendServer.host}:${config.backendServer.port}/file/${fileId}`)
                 .then(response => {
@@ -100,6 +102,26 @@ export default class ViewJavaClassComponent extends Component {
                 });
         });
     };
+
+    OnClickRow = issue => () => {
+        var lineNumberval = issue['LINE'];
+        if (lineNumberval.includes('-')){
+           var lineNo = lineNumberval.split('-')[0]
+        } else {
+            lineNo = lineNumberval;
+        }
+        this.setState({
+            codeLineID:lineNo,
+        }, () => {
+            this.classModal.show();
+        });
+    };
+
+    componentDidMount(){
+        this.setState({
+            codeLineID:this.OnClickRow(),
+        });
+    }
 
 
     render() {
@@ -160,12 +182,18 @@ export default class ViewJavaClassComponent extends Component {
                         <TableComponent
                             headers={this.state.headers}
                             sortable={true}
-                            selectable={false}
+                            selectable={true}
                             columns={this.state.columns}
                             sortColumn={this.state.columns[0]}
                             data={this.state.issues}
                             onUpdateRecords={this.retrieveJavaClassIssues}
+                            onCellClick={this.OnClickRow}
                             ref={instance => this.issuesTable = instance}
+                        />
+                        <ModalShowErrorsJavaClass
+                            ref={instance => this.classModal = instance}
+                            codeLine = {this.state.codeLineID}
+                            fileID = {this.state.javaClass.ID}
                         />
                     </div>}
                 </div>

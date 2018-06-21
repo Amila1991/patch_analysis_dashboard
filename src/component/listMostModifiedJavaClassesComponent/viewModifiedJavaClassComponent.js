@@ -16,7 +16,7 @@ import ViewJavaClassComponent from "../file/viewJavaClassComponent";
 export default class ViewModifiedJavaClassComponent extends ViewJavaClassComponent {
 
     retrieveJavaClass = (fileId) => {
-        console.log("+++++++++++++++++++++++ overrided Method ++++++++++++++++++++++++++++++");
+        console.log("+++++++++++++++++++++++ overrided Method ++++++++++++++++++++++++++++++", fileId);
         this.setState({loading: true}, () => {
             axios.get(`http://${config.backendServer.host}:${config.backendServer.port}/file/mostModifiedJavaClasses/${fileId}`)
                 .then(response => {

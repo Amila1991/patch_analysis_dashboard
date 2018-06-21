@@ -20,6 +20,7 @@ export default class ListMostModifiedJavaClassesComponent extends ListFileCompon
     renderRedirect = () => {
         if (this.state.redirect) {
             //let url =  `/file/${this.state.selectJavaClass}`;
+            console.log("CLASS", this.state.selectJavaClass);
             return <Redirect to={`/file/mostModifiedJavaClasses/${this.state.selectJavaClass.ID}`}/>
         }
     };

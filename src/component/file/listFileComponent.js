@@ -4,8 +4,6 @@ import axios from "axios/index";
 import TableComponent from "../common/tableComponent";
 import config from "../../config";
 import constant from "../constant/constants";
-import ModalJavaClassComponent from "./modalJavaClassComponent";
-
 
 /**
  * @author Amila Karunathilaka
