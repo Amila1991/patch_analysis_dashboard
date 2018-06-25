@@ -35,6 +35,7 @@ export default class ViewJavaClassComponent extends Component {
             issues: [],
             loading: false,
             codeLineID: 0,
+            codeLineEndID: 0,
         };
     }
 
@@ -106,12 +107,15 @@ export default class ViewJavaClassComponent extends Component {
     OnClickRow = issue => () => {
         var lineNumberval = issue['LINE'];
         if (lineNumberval.includes('-')){
-           var lineNo = lineNumberval.split('-')[0]
+           var lineNo = lineNumberval.split('-')[0];
+            var lineNoEnd = lineNumberval.split('-')[1];
         } else {
             lineNo = lineNumberval;
+            lineNoEnd = lineNumberval;
         }
         this.setState({
             codeLineID:lineNo,
+            codeLineEndID:lineNoEnd,
         }, () => {
             this.classModal.show();
         });
@@ -193,6 +197,7 @@ export default class ViewJavaClassComponent extends Component {
                         <ModalShowErrorsJavaClass
                             ref={instance => this.classModal = instance}
                             codeLine = {this.state.codeLineID}
+                            codeEndLine = {this.state.codeLineEndID}
                             fileID = {this.state.javaClass.ID}
                         />
                     </div>}

@@ -23,6 +23,7 @@ export default class ModalShowErrorsJavaClass extends Component {
         this.state = {
             code: '',
             codeLine: 0,
+            codeEndLine: 0,
             openModal: false,
             fileID: 0,
         };
@@ -43,6 +44,7 @@ export default class ModalShowErrorsJavaClass extends Component {
     componentWillMount(){
         this.setState({
             codeLine: this.props.codeLineID,
+            codeEndLine: this.props.codeEndLine,
             fileID: this.props.fileID,
         })
 
@@ -80,7 +82,8 @@ export default class ModalShowErrorsJavaClass extends Component {
 
                         editorDidMount = {(editor) => {
                             var line = this.props.codeLine;
-                            editor.markText({line: line-1, ch: 0}, {line: line-1, ch: 110}, {className: "styled-background"});
+                            var lineEnd = this.props.codeEndLine;
+                            editor.markText({line: line-1, ch: 0}, {line: lineEnd-1, ch: 110}, {className: "styled-background"});
                             var t = editor.charCoords({line: line-1, ch: 0}, "local").top;
                             editor.scrollTo(null, t - 5);
                         }}
